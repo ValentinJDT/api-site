@@ -7,8 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Article
  *
- * @ORM\Table(name="article", indexes={@ORM\Index(name="FK_ARTICLE_RUBRIQUE", columns={"id_rubrique"}), @ORM\Index(name="FK_ARTICLE_EMPLOYE", columns={"id_employe"})})
- * @ORM\Entity
+ * @ORM\Table(name="article", indexes={@ORM\Index(name="fkIdx_145", columns={"id_employe"}), @ORM\Index(name="fkIdx_153", columns={"id_rubrique"})})
+ * @ORM\Entity(repositoryClass="App\Repository\ArticleRepository")
  */
 class Article
 {
@@ -43,6 +43,16 @@ class Article
     private $dateCreation;
 
     /**
+     * @var \Employe
+     *
+     * @ORM\ManyToOne(targetEntity="Employe")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="id_employe", referencedColumnName="id_employe")
+     * })
+     */
+    private $idEmploye;
+
+    /**
      * @var \Rubrique
      *
      * @ORM\ManyToOne(targetEntity="Rubrique")
@@ -52,15 +62,70 @@ class Article
      */
     private $idRubrique;
 
-    /**
-     * @var \Employe
-     *
-     * @ORM\ManyToOne(targetEntity="Employe")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="id_employe", referencedColumnName="id_employe")
-     * })
-     */
-    private $idEmploye;
+    public function getIdArticle(): ?int
+    {
+        return $this->idArticle;
+    }
+
+    public function getContenu(): ?string
+    {
+        return $this->contenu;
+    }
+
+    public function setContenu(string $contenu): self
+    {
+        $this->contenu = $contenu;
+
+        return $this;
+    }
+
+    public function getTitre(): ?string
+    {
+        return $this->titre;
+    }
+
+    public function setTitre(string $titre): self
+    {
+        $this->titre = $titre;
+
+        return $this;
+    }
+
+    public function getDateCreation(): ?\DateTimeInterface
+    {
+        return $this->dateCreation;
+    }
+
+    public function setDateCreation(\DateTimeInterface $dateCreation): self
+    {
+        $this->dateCreation = $dateCreation;
+
+        return $this;
+    }
+
+    public function getIdEmploye(): ?Employe
+    {
+        return $this->idEmploye;
+    }
+
+    public function setIdEmploye(?Employe $idEmploye): self
+    {
+        $this->idEmploye = $idEmploye;
+
+        return $this;
+    }
+
+    public function getIdRubrique(): ?Rubrique
+    {
+        return $this->idRubrique;
+    }
+
+    public function setIdRubrique(?Rubrique $idRubrique): self
+    {
+        $this->idRubrique = $idRubrique;
+
+        return $this;
+    }
 
 
 }

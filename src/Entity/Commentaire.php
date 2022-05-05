@@ -7,8 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Commentaire
  *
- * @ORM\Table(name="commentaire", indexes={@ORM\Index(name="fkIdx_215", columns={"id_produit", "id_declinaison"}), @ORM\Index(name="fkIdx_83", columns={"id_client"})})
- * @ORM\Entity
+ * @ORM\Table(name="commentaire", indexes={@ORM\Index(name="fkIdx_215", columns={"id_produit_declinaison"}), @ORM\Index(name="fkIdx_83", columns={"id_client"})})
+ * @ORM\Entity(repositoryClass="App\Repository\CommentaireRepository")
  */
 class Commentaire
 {
@@ -43,6 +43,16 @@ class Commentaire
     private $description;
 
     /**
+     * @var \ProduitDeclinaison
+     *
+     * @ORM\ManyToOne(targetEntity="ProduitDeclinaison")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="id_produit_declinaison", referencedColumnName="id_produit_declinaison")
+     * })
+     */
+    private $idProduitDeclinaison;
+
+    /**
      * @var \Client
      *
      * @ORM\ManyToOne(targetEntity="Client")
@@ -52,16 +62,70 @@ class Commentaire
      */
     private $idClient;
 
-    /**
-     * @var \ProduitDeclinaison
-     *
-     * @ORM\ManyToOne(targetEntity="ProduitDeclinaison")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="id_produit", referencedColumnName="id_produit"),
-     *   @ORM\JoinColumn(name="id_declinaison", referencedColumnName="id_declinaison")
-     * })
-     */
-    private $idProduit;
+    public function getIdCommentaire(): ?int
+    {
+        return $this->idCommentaire;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTimeInterface $date): self
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    public function getTitre(): ?string
+    {
+        return $this->titre;
+    }
+
+    public function setTitre(string $titre): self
+    {
+        $this->titre = $titre;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getIdProduitDeclinaison(): ?ProduitDeclinaison
+    {
+        return $this->idProduitDeclinaison;
+    }
+
+    public function setIdProduitDeclinaison(?ProduitDeclinaison $idProduitDeclinaison): self
+    {
+        $this->idProduitDeclinaison = $idProduitDeclinaison;
+
+        return $this;
+    }
+
+    public function getIdClient(): ?Client
+    {
+        return $this->idClient;
+    }
+
+    public function setIdClient(?Client $idClient): self
+    {
+        $this->idClient = $idClient;
+
+        return $this;
+    }
 
 
 }

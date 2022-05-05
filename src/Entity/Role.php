@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Role
  *
  * @ORM\Table(name="role")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\RoleRepository")
  */
 class Role
 {
@@ -34,6 +34,35 @@ class Role
      * @ORM\Column(name="power", type="integer", nullable=false)
      */
     private $power = '0';
+
+    public function getIdRole(): ?int
+    {
+        return $this->idRole;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): self
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getPower(): ?int
+    {
+        return $this->power;
+    }
+
+    public function setPower(int $power): self
+    {
+        $this->power = $power;
+
+        return $this;
+    }
 
 
 }

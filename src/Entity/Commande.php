@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Commande
  *
  * @ORM\Table(name="commande", indexes={@ORM\Index(name="fkIdx_95", columns={"id_statut"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\CommandeRepository")
  */
 class Commande
 {
@@ -45,28 +45,46 @@ class Commande
      */
     private $idStatut;
 
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Produit", inversedBy="idProduit")
-     * @ORM\JoinTable(name="commande_declinaison",
-     *   joinColumns={
-     *     @ORM\JoinColumn(name="id_commande", referencedColumnName="id_commande")
-     *   },
-     *   inverseJoinColumns={
-     *     @ORM\JoinColumn(name="id_produit", referencedColumnName="id_produit"),
-     *     @ORM\JoinColumn(name="id_declinaison", referencedColumnName="id_declinaison")
-     *   }
-     * )
-     */
-    private $idProduit;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
+    public function getIdCommande(): ?int
     {
-        $this->idProduit = new \Doctrine\Common\Collections\ArrayCollection();
+        return $this->idCommande;
     }
+
+    public function getIdTable(): ?int
+    {
+        return $this->idTable;
+    }
+
+    public function setIdTable(int $idTable): self
+    {
+        $this->idTable = $idTable;
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTimeInterface $date): self
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    public function getIdStatut(): ?Statut
+    {
+        return $this->idStatut;
+    }
+
+    public function setIdStatut(?Statut $idStatut): self
+    {
+        $this->idStatut = $idStatut;
+
+        return $this;
+    }
+
 
 }

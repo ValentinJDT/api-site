@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Produit
  *
  * @ORM\Table(name="produit", indexes={@ORM\Index(name="fkIdx_124", columns={"id_tva"}), @ORM\Index(name="fkIdx_49", columns={"id_categorie"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\ProduitRepository")
  */
 class Produit
 {
@@ -50,16 +50,6 @@ class Produit
     private $image;
 
     /**
-     * @var \Categorie
-     *
-     * @ORM\ManyToOne(targetEntity="Categorie")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="id_categorie", referencedColumnName="id_categorie")
-     * })
-     */
-    private $idCategorie;
-
-    /**
      * @var \Tva
      *
      * @ORM\ManyToOne(targetEntity="Tva")
@@ -70,26 +60,91 @@ class Produit
     private $idTva;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Categorie
      *
-     * @ORM\ManyToMany(targetEntity="Declinaison", inversedBy="idProduit")
-     * @ORM\JoinTable(name="produit_declinaison",
-     *   joinColumns={
-     *     @ORM\JoinColumn(name="id_produit", referencedColumnName="id_produit")
-     *   },
-     *   inverseJoinColumns={
-     *     @ORM\JoinColumn(name="id_declinaison", referencedColumnName="id_declinaison")
-     *   }
-     * )
+     * @ORM\ManyToOne(targetEntity="Categorie")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="id_categorie", referencedColumnName="id_categorie")
+     * })
      */
-    private $idDeclinaison;
+    private $idCategorie;
 
-    /**
-     * Constructor
-     */
-    public function __construct()
+    public function getIdProduit(): ?int
     {
-        $this->idDeclinaison = new \Doctrine\Common\Collections\ArrayCollection();
+        return $this->idProduit;
     }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): self
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getPrixUnitaire(): ?float
+    {
+        return $this->prixUnitaire;
+    }
+
+    public function setPrixUnitaire(float $prixUnitaire): self
+    {
+        $this->prixUnitaire = $prixUnitaire;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): self
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    public function getIdTva(): ?Tva
+    {
+        return $this->idTva;
+    }
+
+    public function setIdTva(?Tva $idTva): self
+    {
+        $this->idTva = $idTva;
+
+        return $this;
+    }
+
+    public function getIdCategorie(): ?Categorie
+    {
+        return $this->idCategorie;
+    }
+
+    public function setIdCategorie(?Categorie $idCategorie): self
+    {
+        $this->idCategorie = $idCategorie;
+
+        return $this;
+    }
+
 
 }

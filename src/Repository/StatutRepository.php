@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Statut;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -12,9 +14,35 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Statut[]    findAll()
  * @method Statut[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class StatutRepository extends ServiceEntityRepository {
-    public function __construct(ManagerRegistry $registry) {
+class StatutRepository extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
         parent::__construct($registry, Statut::class);
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function add(Statut $entity, bool $flush = true): void
+    {
+        $this->_em->persist($entity);
+        if ($flush) {
+            $this->_em->flush();
+        }
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function remove(Statut $entity, bool $flush = true): void
+    {
+        $this->_em->remove($entity);
+        if ($flush) {
+            $this->_em->flush();
+        }
     }
 
     // /**

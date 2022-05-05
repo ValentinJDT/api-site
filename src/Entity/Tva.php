@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Tva
  *
  * @ORM\Table(name="tva")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\TvaRepository")
  */
 class Tva
 {
@@ -27,6 +27,23 @@ class Tva
      * @ORM\Column(name="pourcentage", type="integer", nullable=false)
      */
     private $pourcentage;
+
+    public function getIdTva(): ?int
+    {
+        return $this->idTva;
+    }
+
+    public function getPourcentage(): ?int
+    {
+        return $this->pourcentage;
+    }
+
+    public function setPourcentage(int $pourcentage): self
+    {
+        $this->pourcentage = $pourcentage;
+
+        return $this;
+    }
 
 
 }

@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Statut
  *
  * @ORM\Table(name="statut")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\StatutRepository")
  */
 class Statut
 {
@@ -34,6 +34,35 @@ class Statut
      * @ORM\Column(name="description", type="text", length=65535, nullable=false)
      */
     private $description;
+
+    public function getIdStatut(): ?int
+    {
+        return $this->idStatut;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): self
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
 
 
 }

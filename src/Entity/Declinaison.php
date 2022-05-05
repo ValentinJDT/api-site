@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Declinaison
  *
  * @ORM\Table(name="declinaison")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\DeclinaisonRepository")
  */
 class Declinaison
 {
@@ -35,19 +35,34 @@ class Declinaison
      */
     private $description;
 
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Produit", mappedBy="idDeclinaison")
-     */
-    private $idProduit;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
+    public function getIdDeclinaison(): ?int
     {
-        $this->idProduit = new \Doctrine\Common\Collections\ArrayCollection();
+        return $this->idDeclinaison;
     }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): self
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
 
 }
