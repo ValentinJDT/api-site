@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : jeu. 14 avr. 2022 à 16:41
+-- Généré le : jeu. 05 mai 2022 à 10:44
 -- Version du serveur :  10.4.13-MariaDB
 -- Version de PHP : 7.4.7
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `afterwork_db`
+-- Base de données : `afterwork_db_2`
 --
 
 -- --------------------------------------------------------
@@ -42,10 +42,7 @@ CREATE TABLE `article` (
 
 INSERT INTO `article` (`contenu`, `id_employe`, `titre`, `date_creation`, `id_rubrique`, `id_article`) VALUES
 ('Un contenu intéressant', 1, 'Un titre absolu', '2022-01-05 15:55:51', 1, 1),
-('qdqdq', 1, 'Test', '2022-01-05 16:53:21', 1, 8),
-('qzdzqdzqdzqd', 1, 'Coucou', '2022-01-18 11:19:39', 2, 9),
-('qqqqq', 1, 'qdqd', '2022-01-18 11:20:26', 1, 10),
-('qdqdqd', 1, 'sss', '2022-01-18 11:20:37', 2, 11);
+('qdqdq', 1, 'Test', '2022-01-05 16:53:21', 1, 8);
 
 -- --------------------------------------------------------
 
@@ -106,16 +103,16 @@ CREATE TABLE `client` (
   `tel` text NOT NULL,
   `mot_de_passe` text NOT NULL,
   `newsletter` binary(1) NOT NULL,
-  `roles_jwt` text NOT NULL,
-  `uuid` varchar(36) NOT NULL
+  `uuid` varchar(36) NOT NULL,
+  `roles_jwt` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `client`
 --
 
-INSERT INTO `client` (`id_client`, `prenom`, `nom`, `mail`, `adresse`, `cp`, `ville`, `tel`, `mot_de_passe`, `newsletter`, `roles_jwt`, `uuid`) VALUES
-(1, 'John', 'DOE', 'john.doe@gmail.com', '18 rue de Bruxelle', '25000', 'Besançon', '0684365230', '$2y$13$Z.lpkjsZ.j1jyQlD7oYaweXXxOj2AJD8W41B8gJRxAlYBQH7lPhmy', 0x01, '[]', 'a5a88d79-3e3a-4db1-af58-1a42fa581ae6');
+INSERT INTO `client` (`id_client`, `prenom`, `nom`, `mail`, `adresse`, `cp`, `ville`, `tel`, `mot_de_passe`, `newsletter`, `uuid`, `roles_jwt`) VALUES
+(1, 'John', 'DOE', 'john.doe@gmail.com', '18 rue de Bruxelle', '25000', 'Besançon', '0684365230', '$2y$13$Z.lpkjsZ.j1jyQlD7oYaweXXxOj2AJD8W41B8gJRxAlYBQH7lPhmy', 0x01, 'a5a88d79-3e3a-4db1-af58-1a42fa581ae6', '[]');
 
 -- --------------------------------------------------------
 
@@ -135,7 +132,7 @@ CREATE TABLE `commande` (
 --
 
 INSERT INTO `commande` (`id_table`, `id_statut`, `date`, `id_commande`) VALUES
-(14, 1, '2022-04-08 13:23:34', 1);
+(14, 1, '2022-05-01 09:37:29', 3);
 
 -- --------------------------------------------------------
 
@@ -144,20 +141,20 @@ INSERT INTO `commande` (`id_table`, `id_statut`, `date`, `id_commande`) VALUES
 --
 
 CREATE TABLE `commande_declinaison` (
+  `id_commande_declinaison` int(11) NOT NULL,
   `quantite` int(11) NOT NULL,
-  `prix_ht` int(11) NOT NULL,
   `id_commande` int(11) NOT NULL,
-  `id_produit` int(11) NOT NULL,
-  `id_declinaison` int(11) NOT NULL
+  `prix_ht` int(11) NOT NULL,
+  `id_produit_declinaison` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `commande_declinaison`
 --
 
-INSERT INTO `commande_declinaison` (`quantite`, `prix_ht`, `id_commande`, `id_produit`, `id_declinaison`) VALUES
-(5, 35, 1, 150, 27),
-(1, 5, 1, 151, 26);
+INSERT INTO `commande_declinaison` (`id_commande_declinaison`, `quantite`, `id_commande`, `prix_ht`, `id_produit_declinaison`) VALUES
+(1, 5, 3, 35, 1),
+(2, 2, 3, 15, 5);
 
 -- --------------------------------------------------------
 
@@ -166,13 +163,12 @@ INSERT INTO `commande_declinaison` (`quantite`, `prix_ht`, `id_commande`, `id_pr
 --
 
 CREATE TABLE `commentaire` (
+  `id_commentaire` int(11) NOT NULL,
   `date` datetime NOT NULL,
   `id_client` int(11) NOT NULL,
   `titre` text NOT NULL,
   `description` text NOT NULL,
-  `id_produit` int(11) NOT NULL,
-  `id_declinaison` int(11) NOT NULL,
-  `id_commentaire` int(11) NOT NULL
+  `id_produit_declinaison` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -225,8 +221,8 @@ CREATE TABLE `employe` (
   `ville` text NOT NULL,
   `cp` text NOT NULL,
   `date_embauche` date NOT NULL,
-  `mail` text NOT NULL,
   `mot_de_passe` text NOT NULL,
+  `mail` text NOT NULL,
   `roles_jwt` text NOT NULL,
   `uuid` varchar(36) NOT NULL,
   `image` longtext DEFAULT NULL
@@ -236,9 +232,8 @@ CREATE TABLE `employe` (
 -- Déchargement des données de la table `employe`
 --
 
-INSERT INTO `employe` (`id_employe`, `nom`, `id_role`, `prenom`, `adresse`, `ville`, `cp`, `date_embauche`, `mail`, `mot_de_passe`, `roles_jwt`, `uuid`, `image`) VALUES
-(1, 'DOE', 1, 'John2', '8 chemin des brouettes', 'Besançon', '25000', '2021-12-16', 'john2.doe@gmail.com', '$2y$13$6lK2psHncBYorqfOsI6KKeHXoEvcxeOF2ZUxGuDtHvjyibAKiOt72', '[]', '8272124e-4c1f-43df-980f-b736fbb0bb3b', NULL),
-(2, 'Jea', 2, 'Val', '9 ch', 'Besançon', '25000', '2021-12-16', 'vjeandot@gmail.com', '$2y$13$Z.lpkjsZ.j1jyQlD7oYaweXXxOj2AJD8W41B8gJRxAlYBQH7lPhmy', '[]', '736f3c00-fc75-40f7-b8a9-55aae12fc11d', '');
+INSERT INTO `employe` (`id_employe`, `nom`, `id_role`, `prenom`, `adresse`, `ville`, `cp`, `date_embauche`, `mot_de_passe`, `mail`, `roles_jwt`, `uuid`, `image`) VALUES
+(1, 'DOE', 1, 'John2', '8 chemin des brouettes', 'Besançon', '25000', '2021-12-16', '$2y$13$Z.lpkjsZ.j1jyQlD7oYaweXXxOj2AJD8W41B8gJRxAlYBQH7lPhmy', 'john2.doe@gmail.com', '[]', '8272124e-4c1f-43df-980f-b736fbb0bb3b', NULL);
 
 -- --------------------------------------------------------
 
@@ -352,7 +347,7 @@ INSERT INTO `produit` (`nom`, `id_tva`, `id_categorie`, `description`, `prix_uni
 ('Miel forêt - 250g', 1, 27, '<p>Miel du JURA - 39190 Val-Sonnette</p>', 0, '', 259),
 ('Machine Automatique Mélitta Solo Noir', 1, 22, 'Machine automatique avec moulin intégré, réservoir d\'eau + 1kg de café offert Pérou Bio Commerce équitable', 0, '', 297),
 ('cafetière', 1, 22, 'Machine à café vendue avec 3 adaptateurs : Café moulu, Capsules Nespresso et Capsules Dolce Gusto. Une machine compact et facile d\'utilisation. Fournit avec un tampeur et une cuillère doseuse.', 0, '', 311),
-('Nougatine noisettes - 150g', 1, 2, '<p style=\"margin-top:0px;margin-bottom:1rem;font-size:14px;color:#888888;font-family:Lato, sans-serif;background-color:#f3f3f3;\">Fabrication artisanale par la Confiserie \"La Sucrerie\" - 39600 Arbois, JURA</p>\n<p style=\"margin-top:0px;margin-bottom:1rem;font-size:14px;color:#888888;font-family:Lato, sans-serif;background-color:#f3f3f3;\">Ingrédients : glucose, sucre, <span>noisettes</span>, beurre</p>', 0, 'data:image/png;base64,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', 314),
+('Nougatine noisettes - 150g', 1, 2, '<p style=\"margin-top:0px;margin-bottom:1rem;font-size:14px;color:#888888;font-family:Lato, sans-serif;background-color:#f3f3f3;\">Fabrication artisanale par la Confiserie \"La Sucrerie\" - 39600 Arbois, JURA</p>\n<p style=\"margin-top:0px;margin-bottom:1rem;font-size:14px;color:#888888;font-family:Lato, sans-serif;background-color:#f3f3f3;\">Ingrédients : glucose, sucre, <span>noisettes</span>, beurre</p>', 0, '', 314),
 ('Nougatine sésame - 150g', 1, 27, '<p style=\"margin-top:0px;margin-bottom:1rem;font-size:14px;color:#888888;font-family:Lato, sans-serif;background-color:#f3f3f3;\">Fabrication artisanale par la Confiserie \"La Sucrerie\" - 39600 Arbois, JURA</p>\n<p style=\"margin-top:0px;margin-bottom:1rem;font-size:14px;color:#888888;font-family:Lato, sans-serif;background-color:#f3f3f3;\">Ingrédients : glucose, sucre, lin,  sésame, beurre</p>\n<p style=\"margin-top:0px;margin-bottom:1rem;font-size:14px;color:#888888;font-family:Lato, sans-serif;background-color:#f3f3f3;\"><span>Traces possibles de fruits à coque</span></p>', 0, '', 315),
 ('Miel Tilleul - 250g', 1, 28, '<p>Miel du JURA - 39190 Val-Sonnette</p>', 0, '', 317),
 ('Miel acacia - 250g', 1, 2, '<p>Miel du JURA - 39190 Val-Sonnette</p>', 0, '', 318),
@@ -440,6 +435,7 @@ INSERT INTO `produit` (`nom`, `id_tva`, `id_categorie`, `description`, `prix_uni
 --
 
 CREATE TABLE `produit_declinaison` (
+  `id_produit_declinaison` int(11) NOT NULL,
   `id_produit` int(11) NOT NULL,
   `id_declinaison` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -448,302 +444,302 @@ CREATE TABLE `produit_declinaison` (
 -- Déchargement des données de la table `produit_declinaison`
 --
 
-INSERT INTO `produit_declinaison` (`id_produit`, `id_declinaison`) VALUES
-(150, 27),
-(150, 28),
-(151, 25),
-(151, 26),
-(152, 25),
-(152, 26),
-(153, 27),
-(153, 28),
-(154, 25),
-(154, 26),
-(155, 25),
-(155, 26),
-(156, 25),
-(156, 26),
-(165, 25),
-(165, 26),
-(166, 25),
-(166, 26),
-(167, 25),
-(167, 26),
-(168, 25),
-(168, 26),
-(169, 27),
-(169, 28),
-(170, 21),
-(170, 22),
-(171, 25),
-(171, 26),
-(172, 25),
-(172, 26),
-(173, 25),
-(173, 26),
-(174, 25),
-(174, 26),
-(175, 25),
-(175, 26),
-(176, 25),
-(176, 26),
-(177, 25),
-(177, 26),
-(178, 25),
-(178, 26),
-(179, 25),
-(179, 26),
-(180, 25),
-(180, 26),
-(181, 25),
-(181, 26),
-(182, 25),
-(182, 26),
-(183, 25),
-(183, 26),
-(184, 25),
-(184, 26),
-(185, 25),
-(185, 26),
-(197, 30),
-(197, 31),
-(197, 32),
-(198, 30),
-(198, 31),
-(198, 32),
-(201, 30),
-(201, 31),
-(201, 32),
-(202, 30),
-(202, 31),
-(202, 32),
-(203, 30),
-(203, 31),
-(203, 32),
-(204, 30),
-(204, 31),
-(204, 32),
-(206, 1),
-(206, 6),
-(206, 7),
-(207, 1),
-(207, 6),
-(207, 7),
-(208, 1),
-(208, 6),
-(208, 7),
-(210, 1),
-(210, 2),
-(210, 3),
-(210, 4),
-(210, 5),
-(210, 6),
-(210, 7),
-(210, 24),
-(211, 1),
-(211, 6),
-(211, 7),
-(212, 1),
-(212, 6),
-(212, 7),
-(213, 1),
-(213, 6),
-(213, 7),
-(214, 1),
-(214, 6),
-(214, 7),
-(216, 1),
-(216, 2),
-(216, 3),
-(216, 4),
-(216, 5),
-(216, 6),
-(216, 7),
-(216, 24),
-(217, 1),
-(217, 2),
-(217, 3),
-(217, 4),
-(217, 5),
-(217, 6),
-(217, 7),
-(217, 24),
-(218, 1),
-(218, 2),
-(218, 3),
-(218, 4),
-(218, 5),
-(218, 6),
-(218, 7),
-(218, 24),
-(220, 1),
-(220, 2),
-(220, 3),
-(220, 4),
-(220, 5),
-(220, 6),
-(220, 7),
-(220, 24),
-(221, 1),
-(221, 2),
-(221, 3),
-(221, 4),
-(221, 5),
-(221, 6),
-(221, 7),
-(221, 24),
-(222, 1),
-(222, 2),
-(222, 3),
-(222, 4),
-(222, 5),
-(222, 6),
-(222, 7),
-(222, 24),
-(223, 1),
-(223, 2),
-(223, 3),
-(223, 4),
-(223, 5),
-(223, 6),
-(223, 7),
-(223, 24),
-(224, 1),
-(224, 2),
-(224, 3),
-(224, 4),
-(224, 5),
-(224, 6),
-(224, 7),
-(224, 24),
-(225, 25),
-(225, 26),
-(226, 25),
-(226, 26),
-(227, 25),
-(227, 26),
-(228, 27),
-(228, 28),
-(240, 25),
-(240, 26),
-(241, 25),
-(241, 26),
-(242, 25),
-(242, 26),
-(243, 25),
-(243, 26),
-(244, 25),
-(244, 26),
-(245, 25),
-(245, 26),
-(246, 30),
-(246, 31),
-(246, 32),
-(247, 1),
-(247, 2),
-(247, 3),
-(247, 4),
-(247, 5),
-(247, 6),
-(247, 7),
-(247, 24),
-(248, 1),
-(248, 2),
-(248, 3),
-(248, 4),
-(248, 5),
-(248, 6),
-(248, 7),
-(248, 24),
-(320, 30),
-(320, 31),
-(320, 32),
-(321, 30),
-(321, 31),
-(321, 32),
-(345, 2),
-(345, 3),
-(345, 4),
-(345, 5),
-(345, 24),
-(353, 7),
-(354, 7),
-(355, 1),
-(355, 7),
-(356, 7),
-(357, 25),
-(357, 26),
-(360, 2),
-(360, 3),
-(360, 4),
-(360, 5),
-(360, 24),
-(369, 21),
-(369, 22),
-(374, 21),
-(374, 22),
-(376, 21),
-(376, 22),
-(377, 21),
-(377, 22),
-(378, 21),
-(378, 22),
-(379, 21),
-(379, 22),
-(380, 21),
-(380, 22),
-(381, 21),
-(381, 22),
-(382, 21),
-(382, 22),
-(383, 21),
-(383, 22),
-(384, 27),
-(384, 28),
-(385, 21),
-(385, 22),
-(386, 21),
-(386, 22),
-(388, 1),
-(388, 2),
-(388, 3),
-(388, 4),
-(388, 5),
-(388, 6),
-(388, 7),
-(388, 24),
-(389, 21),
-(389, 22),
-(390, 21),
-(390, 22),
-(395, 21),
-(395, 22),
-(396, 21),
-(396, 22),
-(397, 21),
-(397, 22),
-(398, 21),
-(398, 22),
-(399, 21),
-(399, 22),
-(400, 21),
-(400, 22),
-(401, 21),
-(401, 22),
-(402, 21),
-(402, 22),
-(403, 21),
-(403, 22),
-(404, 21),
-(404, 22),
-(409, 21),
-(409, 22),
-(410, 21),
-(410, 22),
-(413, 21),
-(413, 22),
-(414, 21),
-(414, 22);
+INSERT INTO `produit_declinaison` (`id_produit_declinaison`, `id_produit`, `id_declinaison`) VALUES
+(1, 150, 27),
+(2, 150, 28),
+(3, 151, 25),
+(4, 151, 26),
+(5, 152, 25),
+(6, 152, 26),
+(7, 153, 27),
+(8, 153, 28),
+(9, 154, 25),
+(10, 154, 26),
+(11, 155, 25),
+(12, 155, 26),
+(13, 156, 25),
+(14, 156, 26),
+(15, 165, 25),
+(16, 165, 26),
+(17, 166, 25),
+(18, 166, 26),
+(19, 167, 25),
+(20, 167, 26),
+(21, 168, 25),
+(22, 168, 26),
+(23, 169, 27),
+(24, 169, 28),
+(25, 170, 21),
+(26, 170, 22),
+(27, 171, 25),
+(28, 171, 26),
+(29, 172, 25),
+(30, 172, 26),
+(31, 173, 25),
+(32, 173, 26),
+(33, 174, 25),
+(34, 174, 26),
+(35, 175, 25),
+(36, 175, 26),
+(37, 176, 25),
+(38, 176, 26),
+(39, 177, 25),
+(40, 177, 26),
+(41, 178, 25),
+(42, 178, 26),
+(43, 179, 25),
+(44, 179, 26),
+(45, 180, 25),
+(46, 180, 26),
+(47, 181, 25),
+(48, 181, 26),
+(49, 182, 25),
+(50, 182, 26),
+(51, 183, 25),
+(52, 183, 26),
+(53, 184, 25),
+(54, 184, 26),
+(55, 185, 25),
+(56, 185, 26),
+(57, 197, 30),
+(58, 197, 31),
+(59, 197, 32),
+(60, 198, 30),
+(61, 198, 31),
+(62, 198, 32),
+(63, 201, 30),
+(64, 201, 31),
+(65, 201, 32),
+(66, 202, 30),
+(67, 202, 31),
+(68, 202, 32),
+(69, 203, 30),
+(70, 203, 31),
+(71, 203, 32),
+(72, 204, 30),
+(73, 204, 31),
+(74, 204, 32),
+(75, 206, 1),
+(76, 206, 6),
+(77, 206, 7),
+(78, 207, 1),
+(79, 207, 6),
+(80, 207, 7),
+(81, 208, 1),
+(82, 208, 6),
+(83, 208, 7),
+(84, 210, 1),
+(85, 210, 2),
+(86, 210, 3),
+(87, 210, 4),
+(88, 210, 5),
+(89, 210, 6),
+(90, 210, 7),
+(91, 210, 24),
+(92, 211, 1),
+(93, 211, 6),
+(94, 211, 7),
+(95, 212, 1),
+(96, 212, 6),
+(97, 212, 7),
+(98, 213, 1),
+(99, 213, 6),
+(100, 213, 7),
+(101, 214, 1),
+(102, 214, 6),
+(103, 214, 7),
+(104, 216, 1),
+(105, 216, 2),
+(106, 216, 3),
+(107, 216, 4),
+(108, 216, 5),
+(109, 216, 6),
+(110, 216, 7),
+(111, 216, 24),
+(112, 217, 1),
+(113, 217, 2),
+(114, 217, 3),
+(115, 217, 4),
+(116, 217, 5),
+(117, 217, 6),
+(118, 217, 7),
+(119, 217, 24),
+(120, 218, 1),
+(121, 218, 2),
+(122, 218, 3),
+(123, 218, 4),
+(124, 218, 5),
+(125, 218, 6),
+(126, 218, 7),
+(127, 218, 24),
+(128, 220, 1),
+(129, 220, 2),
+(130, 220, 3),
+(131, 220, 4),
+(132, 220, 5),
+(133, 220, 6),
+(134, 220, 7),
+(135, 220, 24),
+(136, 221, 1),
+(137, 221, 2),
+(138, 221, 3),
+(139, 221, 4),
+(140, 221, 5),
+(141, 221, 6),
+(142, 221, 7),
+(143, 221, 24),
+(144, 222, 1),
+(145, 222, 2),
+(146, 222, 3),
+(147, 222, 4),
+(148, 222, 5),
+(149, 222, 6),
+(150, 222, 7),
+(151, 222, 24),
+(152, 223, 1),
+(153, 223, 2),
+(154, 223, 3),
+(155, 223, 4),
+(156, 223, 5),
+(157, 223, 6),
+(158, 223, 7),
+(159, 223, 24),
+(160, 224, 1),
+(161, 224, 2),
+(162, 224, 3),
+(163, 224, 4),
+(164, 224, 5),
+(165, 224, 6),
+(166, 224, 7),
+(167, 224, 24),
+(168, 225, 25),
+(169, 225, 26),
+(170, 226, 25),
+(171, 226, 26),
+(172, 227, 25),
+(173, 227, 26),
+(174, 228, 27),
+(175, 228, 28),
+(176, 240, 25),
+(177, 240, 26),
+(178, 241, 25),
+(179, 241, 26),
+(180, 242, 25),
+(181, 242, 26),
+(182, 243, 25),
+(183, 243, 26),
+(184, 244, 25),
+(185, 244, 26),
+(186, 245, 25),
+(187, 245, 26),
+(188, 246, 30),
+(189, 246, 31),
+(190, 246, 32),
+(191, 247, 1),
+(192, 247, 2),
+(193, 247, 3),
+(194, 247, 4),
+(195, 247, 5),
+(196, 247, 6),
+(197, 247, 7),
+(198, 247, 24),
+(199, 248, 1),
+(200, 248, 2),
+(201, 248, 3),
+(202, 248, 4),
+(203, 248, 5),
+(204, 248, 6),
+(205, 248, 7),
+(206, 248, 24),
+(207, 320, 30),
+(208, 320, 31),
+(209, 320, 32),
+(210, 321, 30),
+(211, 321, 31),
+(212, 321, 32),
+(213, 345, 2),
+(214, 345, 3),
+(215, 345, 4),
+(216, 345, 5),
+(217, 345, 24),
+(218, 353, 7),
+(219, 354, 7),
+(220, 355, 1),
+(221, 355, 7),
+(222, 356, 7),
+(223, 357, 25),
+(224, 357, 26),
+(225, 360, 2),
+(226, 360, 3),
+(227, 360, 4),
+(228, 360, 5),
+(229, 360, 24),
+(230, 369, 21),
+(231, 369, 22),
+(232, 374, 21),
+(233, 374, 22),
+(234, 376, 21),
+(235, 376, 22),
+(236, 377, 21),
+(237, 377, 22),
+(238, 378, 21),
+(239, 378, 22),
+(240, 379, 21),
+(241, 379, 22),
+(242, 380, 21),
+(243, 380, 22),
+(244, 381, 21),
+(245, 381, 22),
+(246, 382, 21),
+(247, 382, 22),
+(248, 383, 21),
+(249, 383, 22),
+(250, 384, 27),
+(251, 384, 28),
+(252, 385, 21),
+(253, 385, 22),
+(254, 386, 21),
+(255, 386, 22),
+(256, 388, 1),
+(257, 388, 2),
+(258, 388, 3),
+(259, 388, 4),
+(260, 388, 5),
+(261, 388, 6),
+(262, 388, 7),
+(263, 388, 24),
+(264, 389, 21),
+(265, 389, 22),
+(266, 390, 21),
+(267, 390, 22),
+(268, 395, 21),
+(269, 395, 22),
+(270, 396, 21),
+(271, 396, 22),
+(272, 397, 21),
+(273, 397, 22),
+(274, 398, 21),
+(275, 398, 22),
+(276, 399, 21),
+(277, 399, 22),
+(278, 400, 21),
+(279, 400, 22),
+(280, 401, 21),
+(281, 401, 22),
+(282, 402, 21),
+(283, 402, 22),
+(284, 403, 21),
+(285, 403, 22),
+(286, 404, 21),
+(287, 404, 22),
+(288, 409, 21),
+(289, 409, 22),
+(290, 410, 21),
+(291, 410, 22),
+(292, 413, 21),
+(293, 413, 22),
+(294, 414, 21),
+(295, 414, 22);
 
 -- --------------------------------------------------------
 
@@ -783,8 +779,7 @@ CREATE TABLE `rubrique` (
 --
 
 INSERT INTO `rubrique` (`id_rubrique`, `titre`, `description`) VALUES
-(1, 'Rub1', 'Desc de fou'),
-(2, 'Rub2', 'Desc de fou2');
+(1, 'Rub1', 'Desc de fou');
 
 -- --------------------------------------------------------
 
@@ -835,8 +830,8 @@ INSERT INTO `tva` (`id_tva`, `pourcentage`) VALUES
 --
 ALTER TABLE `article`
   ADD PRIMARY KEY (`id_article`),
-  ADD KEY `FK_ARTICLE_RUBRIQUE` (`id_rubrique`),
-  ADD KEY `FK_ARTICLE_EMPLOYE` (`id_employe`);
+  ADD KEY `fkIdx_145` (`id_employe`),
+  ADD KEY `fkIdx_153` (`id_rubrique`);
 
 --
 -- Index pour la table `categorie`
@@ -848,8 +843,7 @@ ALTER TABLE `categorie`
 -- Index pour la table `client`
 --
 ALTER TABLE `client`
-  ADD PRIMARY KEY (`id_client`),
-  ADD UNIQUE KEY `mail` (`mail`) USING HASH;
+  ADD PRIMARY KEY (`id_client`);
 
 --
 -- Index pour la table `commande`
@@ -862,16 +856,16 @@ ALTER TABLE `commande`
 -- Index pour la table `commande_declinaison`
 --
 ALTER TABLE `commande_declinaison`
-  ADD PRIMARY KEY (`id_commande`,`id_produit`,`id_declinaison`),
-  ADD KEY `fkIdx_181` (`id_commande`),
-  ADD KEY `fkIdx_211` (`id_produit`,`id_declinaison`);
+  ADD PRIMARY KEY (`id_commande_declinaison`),
+  ADD KEY `FK_221` (`id_produit_declinaison`),
+  ADD KEY `FK_242` (`id_commande`);
 
 --
 -- Index pour la table `commentaire`
 --
 ALTER TABLE `commentaire`
   ADD PRIMARY KEY (`id_commentaire`),
-  ADD KEY `fkIdx_215` (`id_produit`,`id_declinaison`),
+  ADD KEY `fkIdx_215` (`id_produit_declinaison`),
   ADD KEY `fkIdx_83` (`id_client`);
 
 --
@@ -885,7 +879,6 @@ ALTER TABLE `declinaison`
 --
 ALTER TABLE `employe`
   ADD PRIMARY KEY (`id_employe`),
-  ADD UNIQUE KEY `mail` (`mail`) USING HASH,
   ADD KEY `fkIdx_113` (`id_role`);
 
 --
@@ -900,9 +893,9 @@ ALTER TABLE `produit`
 -- Index pour la table `produit_declinaison`
 --
 ALTER TABLE `produit_declinaison`
-  ADD PRIMARY KEY (`id_produit`,`id_declinaison`),
-  ADD KEY `fkIdx_203` (`id_produit`),
-  ADD KEY `fkIdx_207` (`id_declinaison`);
+  ADD PRIMARY KEY (`id_produit_declinaison`),
+  ADD KEY `FK_234` (`id_produit`),
+  ADD KEY `FK_237` (`id_declinaison`);
 
 --
 -- Index pour la table `role`
@@ -936,7 +929,7 @@ ALTER TABLE `tva`
 -- AUTO_INCREMENT pour la table `article`
 --
 ALTER TABLE `article`
-  MODIFY `id_article` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_article` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT pour la table `categorie`
@@ -954,7 +947,13 @@ ALTER TABLE `client`
 -- AUTO_INCREMENT pour la table `commande`
 --
 ALTER TABLE `commande`
-  MODIFY `id_commande` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_commande` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT pour la table `commande_declinaison`
+--
+ALTER TABLE `commande_declinaison`
+  MODIFY `id_commande_declinaison` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT pour la table `commentaire`
@@ -972,13 +971,19 @@ ALTER TABLE `declinaison`
 -- AUTO_INCREMENT pour la table `employe`
 --
 ALTER TABLE `employe`
-  MODIFY `id_employe` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_employe` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `produit`
 --
 ALTER TABLE `produit`
   MODIFY `id_produit` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=415;
+
+--
+-- AUTO_INCREMENT pour la table `produit_declinaison`
+--
+ALTER TABLE `produit_declinaison`
+  MODIFY `id_produit_declinaison` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=296;
 
 --
 -- AUTO_INCREMENT pour la table `role`
@@ -990,7 +995,7 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT pour la table `rubrique`
 --
 ALTER TABLE `rubrique`
-  MODIFY `id_rubrique` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_rubrique` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `statut`
@@ -1012,8 +1017,8 @@ ALTER TABLE `tva`
 -- Contraintes pour la table `article`
 --
 ALTER TABLE `article`
-  ADD CONSTRAINT `FK_ARTICLE_EMPLOYE` FOREIGN KEY (`id_employe`) REFERENCES `employe` (`id_employe`),
-  ADD CONSTRAINT `FK_ARTICLE_RUBRIQUE` FOREIGN KEY (`id_rubrique`) REFERENCES `rubrique` (`id_rubrique`);
+  ADD CONSTRAINT `FK_143` FOREIGN KEY (`id_employe`) REFERENCES `employe` (`id_employe`),
+  ADD CONSTRAINT `FK_151` FOREIGN KEY (`id_rubrique`) REFERENCES `rubrique` (`id_rubrique`);
 
 --
 -- Contraintes pour la table `commande`
@@ -1025,14 +1030,14 @@ ALTER TABLE `commande`
 -- Contraintes pour la table `commande_declinaison`
 --
 ALTER TABLE `commande_declinaison`
-  ADD CONSTRAINT `FK_179` FOREIGN KEY (`id_commande`) REFERENCES `commande` (`id_commande`),
-  ADD CONSTRAINT `FK_208` FOREIGN KEY (`id_produit`,`id_declinaison`) REFERENCES `produit_declinaison` (`id_produit`, `id_declinaison`);
+  ADD CONSTRAINT `FK_218` FOREIGN KEY (`id_produit_declinaison`) REFERENCES `produit_declinaison` (`id_produit_declinaison`),
+  ADD CONSTRAINT `FK_240` FOREIGN KEY (`id_commande`) REFERENCES `commande` (`id_commande`);
 
 --
 -- Contraintes pour la table `commentaire`
 --
 ALTER TABLE `commentaire`
-  ADD CONSTRAINT `FK_212` FOREIGN KEY (`id_produit`,`id_declinaison`) REFERENCES `produit_declinaison` (`id_produit`, `id_declinaison`),
+  ADD CONSTRAINT `FK_212` FOREIGN KEY (`id_produit_declinaison`) REFERENCES `produit_declinaison` (`id_produit_declinaison`),
   ADD CONSTRAINT `FK_81` FOREIGN KEY (`id_client`) REFERENCES `client` (`id_client`);
 
 --
@@ -1052,8 +1057,8 @@ ALTER TABLE `produit`
 -- Contraintes pour la table `produit_declinaison`
 --
 ALTER TABLE `produit_declinaison`
-  ADD CONSTRAINT `FK_201` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`),
-  ADD CONSTRAINT `FK_205` FOREIGN KEY (`id_declinaison`) REFERENCES `declinaison` (`id_declinaison`);
+  ADD CONSTRAINT `FK_232` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`),
+  ADD CONSTRAINT `FK_235` FOREIGN KEY (`id_declinaison`) REFERENCES `declinaison` (`id_declinaison`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
