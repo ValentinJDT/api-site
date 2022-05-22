@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class CommandeController extends AbstractController {
 
@@ -44,6 +45,23 @@ class CommandeController extends AbstractController {
     public function getOrderProducts($id): Response {
         $products = $this->commandeDeclinaisonRepository->findBy([ "idCommande" => $id ]);
         $productsJson = $this->serializer->serialize($products, 'json');
+
+        return new JsonResponse($productsJson, Response::HTTP_OK, [], true);
+    }
+
+    /**
+     * @Route("/api/orders/{id}", name="api_order_setmore", methods={"PUT"})
+     */
+    public function setMore($id, Request $request): Response {
+        $order = $this->commandeRepository->findBy([ "idCommande" => $id ])[0];
+
+        $content = json_decode($request->getContent());
+
+        if($content["more"]) {
+            $order->setMore($content["more"]);
+        }
+
+        $productsJson = $this->serializer->serialize($order, 'json');
 
         return new JsonResponse($productsJson, Response::HTTP_OK, [], true);
     }

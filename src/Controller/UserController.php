@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
 use App\Entity\Employe;
+use App\Repository\ClientRepository;
 use App\Repository\EmployeRepository;
 use App\Repository\RoleRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,14 +23,16 @@ class UserController extends AbstractController {
     private SerializerInterface $serializer;
     private EntityManagerInterface $entityManager;
     private EmployeRepository $employeRepository;
+    private ClientRepository $clientRepository;
     private UserPasswordHasherInterface $userPasswordHasher;
     private RoleRepository $roleRepository;
 
-    public function __construct(SerializerInterface $serializer, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, EmployeRepository $employeRepository, RoleRepository $roleRepository) {
+    public function __construct(SerializerInterface $serializer, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, EmployeRepository $employeRepository, ClientRepository $clientRepository, RoleRepository $roleRepository) {
         $this->serializer = $serializer;
         $this->userPasswordHasher = $userPasswordHasher;
         $this->entityManager = $entityManager;
         $this->employeRepository = $employeRepository;
+        $this->clientRepository = $clientRepository;
         $this->roleRepository = $roleRepository;
     }
 
@@ -38,6 +43,15 @@ class UserController extends AbstractController {
     public function createEmploye(Request $request): Response {
 
         $content = json_decode($request->getContent(), true);
+
+        if($this->userExist($content["email"])) {
+            $json = json_encode([
+                "code" => Response::HTTP_UNAUTHORIZED,
+                "message" => "Identifier already exist"
+            ]);
+
+            return new JsonResponse($json, Response::HTTP_UNAUTHORIZED, [], true);
+        }
 
         try {
             $employe = new Employe();
@@ -70,7 +84,7 @@ class UserController extends AbstractController {
                 "message" => "Malformatted JSON"
             ]);
 
-            return new JsonResponse($json, $json["code"], [], true);
+            return new JsonResponse($json, Response::HTTP_BAD_REQUEST, [], true);
         }
 
         return new JsonResponse($json, Response::HTTP_OK, [], true);
@@ -146,7 +160,7 @@ class UserController extends AbstractController {
         $employe = $this->employeRepository->findBy(["uuid" => $uuid]);
 
         if(!empty($employe)) {
-            $roleJson = $this->serializer->serialize($employe[0]->getRole(), "json", ["groups" => "view_role"]);
+            $roleJson = $this->serializer->serialize($employe[0]->getRole(), "json");
         } else {
             $roleJson = json_encode(null);
         }
@@ -162,7 +176,7 @@ class UserController extends AbstractController {
         $employe = $this->employeRepository->findBy(["uuid" => $uuid]);
 
         if(!empty($employe)) {
-            $employeJson = $this->serializer->serialize($employe[0], "json", ["groups" => "view_employe"]);
+            $employeJson = $this->serializer->serialize($employe[0], "json");
         } else {
             $employeJson = json_encode(null);
         }
@@ -175,7 +189,7 @@ class UserController extends AbstractController {
      */
     public function getEmployes(): Response {
         $employes = $this->employeRepository->findAll();
-        $employesJson = $this->serializer->serialize($employes, "json", ["groups" => "view_employe"]);
+        $employesJson = $this->serializer->serialize($employes, "json");
         return new JsonResponse($employesJson, Response::HTTP_OK, [], true);
     }
 
@@ -184,7 +198,7 @@ class UserController extends AbstractController {
      */
     public function getEmployesByRole($id): Response {
         $employes = $this->employeRepository->findBy(["role" => $id]);
-        $employesJson = $this->serializer->serialize($employes, "json", ["groups" => "view_employe"]);
+        $employesJson = $this->serializer->serialize($employes, "json");
         return new JsonResponse($employesJson, Response::HTTP_OK, [], true);
     }
 
@@ -216,6 +230,139 @@ class UserController extends AbstractController {
 
         return new JsonResponse($json, Response::HTTP_OK, [], true);
 
+    }
+
+    /**
+     * @Route("/api/clients", name="api_client_getclients", methods={"GET"})
+     */
+    public function getClients(): Response {
+        $client = $this->clientRepository->findAll();
+        $clientJson = $this->serializer->serialize($client, "json");
+        return new JsonResponse($clientJson, Response::HTTP_OK, [], true);
+    }
+
+    /**
+     * @Route("/api/clients/{uuid}", name="api_client_getclient", methods={"GET"})
+     */
+    public function getClient($uuid): Response {
+
+        $client = $this->clientRepository->findBy(["uuid" => $uuid]);
+
+        if(!empty($client)) {
+            $clientJson = $this->serializer->serialize($client[0], "json");
+        } else {
+            $clientJson = json_encode(null);
+        }
+
+        return new JsonResponse($clientJson, Response::HTTP_OK, [], true);
+    }
+
+    /**
+     * @Route("/api/clients", name="api_client_createclient", methods={"POST"})
+     */
+    public function createClient(Request $request): Response {
+        $content = json_decode($request->getContent(), true);
+
+        if($this->userExist($content["email"])) {
+            $json = json_encode([
+                "code" => Response::HTTP_UNAUTHORIZED,
+                "message" => "Identifier already exist"
+            ]);
+
+            return new JsonResponse($json, Response::HTTP_UNAUTHORIZED, [], true);
+        }
+
+        try {
+            $client = new Client();
+
+            $password = $this->userPasswordHasher->hashPassword($client, base64_decode($content["password"]));
+            $client->setPassword($password);
+
+            $client->setUuid($this->guidv4());
+            $client->setPrenom($content["firstname"]);
+            $client->setNom($content["lastname"]);
+            $client->setEmail($content["email"]);
+            $client->setAdresse($content["address"]);
+            $client->setVille($content["city"]);
+            $client->setCp($content["zip_code"]);
+            $client->setRoles(array());
+            $client->setTel($content["phone"]);
+            $client->setNewsletter($content["newsletter"]);
+
+            $this->entityManager->persist($client);
+            $this->entityManager->flush();
+
+            $json = $this->serializer->serialize($client, "json");
+
+        } catch(Exception $e) {
+            $json = json_encode([
+                "code" => Response::HTTP_BAD_REQUEST,
+                "message" => "Malformatted JSON"
+            ]);
+
+            return new JsonResponse($json, Response::HTTP_BAD_REQUEST, [], true);
+        }
+
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
+    }
+
+    /**
+     * @Route("/api/clients/set-password/{id}", name="api_client_setclientpassword", methods={"PUT"})
+     */
+    public function setClientPassword($id, Request $request): Response {
+
+        $content = json_decode($request->getContent(), true);
+
+        try {
+            $client = $this->clientRepository->findBy(["uuid" => $id])[0];
+
+            $password = $this->userPasswordHasher->hashPassword($client, base64_decode($content["password"]));
+            $client->setPassword($password);
+
+            $this->entityManager->flush();
+
+            $json = $this->serializer->serialize($client, "json");
+
+        } catch(Exception $e) {
+            $json = json_encode([
+                "code" => Response::HTTP_BAD_REQUEST,
+                "message" => "Malformatted JSON"
+            ]);
+
+            return new JsonResponse($json, Response::HTTP_BAD_REQUEST, [], true);
+        }
+
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
+
+    }
+
+    /**
+     * @Route("/api/clients/newsletter/{uuid}", name="api_client_getnewsletter", methods={"PUT"})
+     */
+    public function setClientNewsletter($uuid): Response {
+
+        $client = $this->clientRepository->findBy(["uuid" => $uuid]);
+
+        if(!empty($client)) {
+
+            $client = $client[0];
+            $client->setNewsletter(!$client->getNewsletter());
+
+            $this->entityManager->flush();
+
+            $clientJson = $this->serializer->serialize($client, "json");
+        } else {
+            $clientJson = json_encode(null);
+        }
+
+        return new JsonResponse($clientJson, Response::HTTP_OK, [], true);
+    }
+
+    public function userExist($email): bool {
+        $employee = $this->employeRepository->findBy(["email" => $email]);
+        $clients = $this->clientRepository->findBy(["email" => $email]);
+
+        return sizeof($employee) != 0 || sizeof($clients) != 0;
     }
 
     public function guidv4() {

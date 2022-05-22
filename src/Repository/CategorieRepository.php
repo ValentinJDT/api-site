@@ -3,10 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\Categorie;
+use App\Entity\Produit;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query\Expr\Join;
 
 /**
  * @method Categorie|null find($id, $lockMode = null, $lockVersion = null)
@@ -52,8 +54,9 @@ class CategorieRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('c')
             ->distinct()
             ->select('c.idCategorie, c.nom, c.description, COUNT(p.idProduit) as numProduits')
-            ->innerJoin(Produit::class, 'p', Join::WITH, "c.idCategorie = p.categorie")
+            ->innerJoin(Produit::class, 'p', Join::WITH, "c.idCategorie = p.idCategorie")
             ->groupBy('c.idCategorie, c.nom, c.description')
+            ->orderBy('COUNT(p.idProduit)', 'DESC')
             ->having('COUNT(p.idProduit) > 0')
             ->getQuery()->getArrayResult();
     }

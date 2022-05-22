@@ -25,7 +25,7 @@ class RoleController extends AbstractController {
     public function getRoles(): Response {
 
         $roles = $this->roleRepository->findAll();
-        $rolesJson = $this->serializer->serialize($roles, 'json', ["groups" => "view_role"]);
+        $rolesJson = $this->serializer->serialize($roles, 'json');
 
         return new JsonResponse($rolesJson, Response::HTTP_OK, [], true);
     }

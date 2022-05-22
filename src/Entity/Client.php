@@ -93,7 +93,7 @@ class Client implements UserInterface, PasswordAuthenticatedUserInterface {
     /**
      * @var binary
      *
-     * @ORM\Column(name="newsletter", type="binary", nullable=false)
+     * @ORM\Column(name="newsletter", type="boolean", nullable=false)
      */
     private $newsletter;
 

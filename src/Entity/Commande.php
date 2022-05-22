@@ -36,6 +36,13 @@ class Commande
     private $date;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="more", type="text", nullable=true)
+     */
+    private $more;
+
+    /**
      * @var \Statut
      *
      * @ORM\ManyToOne(targetEntity="Statut")
@@ -74,6 +81,18 @@ class Commande
         return $this;
     }
 
+    public function getMore(): ?string
+    {
+        return $this->more;
+    }
+
+    public function setMore(string $more): self
+    {
+        $this->more = $more;
+
+        return $this;
+    }
+
     public function getIdStatut(): ?Statut
     {
         return $this->idStatut;
@@ -85,6 +104,4 @@ class Commande
 
         return $this;
     }
-
-
 }

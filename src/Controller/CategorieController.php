@@ -81,7 +81,7 @@ class CategorieController extends AbstractController {
                 "message" => "Erreur de syntaxe dans le JSON"
             ];
 
-            return new JsonResponse(json_encode($error), $error["status"], [], true);
+            return new JsonResponse(json_encode($error), Response::HTTP_BAD_REQUEST, [], true);
         }
     }
 

@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\ProduitDeclinaison;
 use App\Repository\DeclinaisonRepository;
+use App\Repository\ProduitDeclinaisonRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,11 +13,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class DeclinaisonController extends AbstractController {
 
-    private DeclinaisonRepository $declinaisonRepository;
+    private ProduitDeclinaisonRepository $produitDeclinaisonRepository;
     private SerializerInterface $serializer;
 
-    public function __construct(DeclinaisonRepository $declinaisonRepository, SerializerInterface $serializer) {
+    public function __construct(DeclinaisonRepository $declinaisonRepository, ProduitDeclinaisonRepository $produitDeclinaisonRepository, SerializerInterface $serializer) {
         $this->declinaisonRepository = $declinaisonRepository;
+        $this->produitDeclinaisonRepository = $produitDeclinaisonRepository;
         $this->serializer = $serializer;
     }
 
@@ -25,7 +28,7 @@ class DeclinaisonController extends AbstractController {
     public function getDeclinaisons(): Response {
         $declinaisons = $this->declinaisonRepository->findAll();
 
-        $productsJson = $this->serializer->serialize($declinaisons, 'json', ["groups" => "view_declinaison"]);
+        $productsJson = $this->serializer->serialize($declinaisons, 'json');
 
         return new JsonResponse($productsJson, Response::HTTP_OK, [], true);
     }
@@ -36,7 +39,18 @@ class DeclinaisonController extends AbstractController {
     public function getDeclinaisonByID($id): Response {
         $declinaisons = $this->declinaisonRepository->find($id);
 
-        $productsJson = $this->serializer->serialize($declinaisons, 'json', ["groups" => "view_declinaison"]);
+        $productsJson = $this->serializer->serialize($declinaisons, 'json');
+
+        return new JsonResponse($productsJson, Response::HTTP_OK, [], true);
+    }
+
+    /**
+     * @Route("/api/declinaisons/product/{id}", name="api_declinaison_getdeclinaisonbyidproduit", methods={"GET"})
+     */
+    public function getDeclinaisonByIdProduit($id): Response {
+        $declinaisons = $this->produitDeclinaisonRepository->findBy(["idProduit" => ["idProduit" => $id]]);
+
+        $productsJson = $this->serializer->serialize($declinaisons, 'json');
 
         return new JsonResponse($productsJson, Response::HTTP_OK, [], true);
     }
